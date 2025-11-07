@@ -1,4 +1,5 @@
 # Desafio Structure data from PDF - Enter AI Fellowship - Ian Klein
+# Apresentação: https://www.loom.com/share/93b1b3989e2f4ecb98a2311a8ae95157
 
 > Sistema inteligente de extração de dados estruturados de PDFs usando IA com interface web moderna e cache semântico
 
