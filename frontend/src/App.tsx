@@ -4,6 +4,7 @@ import { HeroSection } from './components/HeroSection';
 import { ExtractionForm } from './components/ExtractionForm';
 import { LoadingPanel } from './components/LoadingPanel';
 import { ResultsPanel } from './components/ResultsPanel';
+import { Footer } from './components/Footer';
 import { Toaster } from './components/ui/sonner';
 import { toast } from 'sonner';
 import type { SchemaField, UploadedFile, ExtractionMetadata } from './types/extraction';
@@ -202,6 +203,8 @@ export default function App() {
           onReset={handleReset}
         />
       )}
+
+      <Footer />
     </div>
   );
 }
