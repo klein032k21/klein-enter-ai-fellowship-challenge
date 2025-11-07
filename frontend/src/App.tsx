@@ -163,7 +163,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-black flex flex-col">
       <Toaster
         position="top-right"
         toastOptions={{
@@ -175,34 +175,36 @@ export default function App() {
         }}
       />
 
-      <ChallengeBanner />
-      <HeroSection />
+      <div className="flex-grow">
+        <ChallengeBanner />
+        <HeroSection />
 
-      {state === 'form' && (
-        <ExtractionForm
-          schemaFields={schemaFields}
-          documentLabel={documentLabel}
-          files={files}
-          onSchemaFieldsChange={setSchemaFields}
-          onDocumentLabelChange={setDocumentLabel}
-          onFilesAdded={handleFilesAdded}
-          onFileRemove={handleFileRemove}
-          onSubmit={handleSubmit}
-          isProcessing={false}
-        />
-      )}
+        {state === 'form' && (
+          <ExtractionForm
+            schemaFields={schemaFields}
+            documentLabel={documentLabel}
+            files={files}
+            onSchemaFieldsChange={setSchemaFields}
+            onDocumentLabelChange={setDocumentLabel}
+            onFilesAdded={handleFilesAdded}
+            onFileRemove={handleFileRemove}
+            onSubmit={handleSubmit}
+            isProcessing={false}
+          />
+        )}
 
-      {state === 'processing' && (
-        <LoadingPanel elapsedTime={elapsedTime} statusMessage={statusMessage} />
-      )}
+        {state === 'processing' && (
+          <LoadingPanel elapsedTime={elapsedTime} statusMessage={statusMessage} />
+        )}
 
-      {state === 'results' && (
-        <ResultsPanel
-          extractedData={extractedData}
-          metadata={metadata}
-          onReset={handleReset}
-        />
-      )}
+        {state === 'results' && (
+          <ResultsPanel
+            extractedData={extractedData}
+            metadata={metadata}
+            onReset={handleReset}
+          />
+        )}
+      </div>
 
       <Footer />
     </div>
