@@ -16,7 +16,7 @@ Este projeto é uma aplicação **full-stack completa** com backend Flask e fron
 
 **Para rodar localmente:**
 1. Execute os comandos do TL;DR abaixo
-2. Acesse `http://localhost:5000` no seu navegador
+2. Acesse `http://localhost:5173/` no seu navegador
 3. O frontend estará disponível automaticamente (já compilado em `frontend/dist/`)
 
 O servidor Flask entrega a interface React e processa as requisições de extração de PDF. Sem necessidade de rodar frontend separadamente!
@@ -42,7 +42,7 @@ cd ..
 
 # 4. Run
 python app.py
-# Acesse: http://localhost:5000
+# Acesse: http://localhost:5173
 ```
 
 ### 🔑 Variáveis de Ambiente Necessárias
