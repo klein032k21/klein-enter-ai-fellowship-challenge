@@ -1,4 +1,4 @@
-# 🚀 PDF Extractor Fellowship - Enter AI
+# Desafio Structure data from PDF - Enter AI Fellowship - Ian Klein
 
 > Sistema inteligente de extração de dados estruturados de PDFs usando IA com interface web moderna e cache semântico
 
