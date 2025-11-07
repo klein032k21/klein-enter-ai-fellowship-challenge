@@ -148,28 +148,42 @@ def extract_stream():
     - event: result, data: {dados extraídos}
     - event: error, data: {"error": "mensagem"}
     """
-    def generate():
+    # Validar entrada ANTES do generator (dentro do contexto da requisição)
+    try:
+        if not request.is_json:
+            return Response(
+                f"event: error\ndata: {json.dumps({'error': 'Content-Type deve ser application/json'}, ensure_ascii=False)}\n\n",
+                mimetype='text/event-stream'
+            )
+
+        data = request.get_json()
+
+        if not data:
+            return Response(
+                f"event: error\ndata: {json.dumps({'error': 'Corpo vazio'}, ensure_ascii=False)}\n\n",
+                mimetype='text/event-stream'
+            )
+
+        required_fields = ['label', 'extraction_schema', 'pdf']
+        for field in required_fields:
+            if field not in data:
+                return Response(
+                    f"event: error\ndata: {json.dumps({'error': f'Campo ausente: {field}'}, ensure_ascii=False)}\n\n",
+                    mimetype='text/event-stream'
+                )
+
+        label = data['label']
+        extraction_schema = data['extraction_schema']
+        pdf_base64 = data['pdf']
+    except Exception as e:
+        return Response(
+            f"event: error\ndata: {json.dumps({'error': f'Erro ao validar requisição: {str(e)}'}, ensure_ascii=False)}\n\n",
+            mimetype='text/event-stream'
+        )
+
+    # Generator agora recebe os dados já validados
+    def generate(label, extraction_schema, pdf_base64):
         try:
-            # Validar entrada
-            if not request.is_json:
-                yield f"event: error\ndata: {json.dumps({'error': 'Content-Type deve ser application/json'}, ensure_ascii=False)}\n\n"
-                return
-
-            data = request.get_json()
-
-            if not data:
-                yield f"event: error\ndata: {json.dumps({'error': 'Corpo vazio'}, ensure_ascii=False)}\n\n"
-                return
-
-            required_fields = ['label', 'extraction_schema', 'pdf']
-            for field in required_fields:
-                if field not in data:
-                    yield f"event: error\ndata: {json.dumps({'error': f'Campo ausente: {field}'}, ensure_ascii=False)}\n\n"
-                    return
-
-            label = data['label']
-            extraction_schema = data['extraction_schema']
-            pdf_base64 = data['pdf']
 
             # Enviar status: processando
             yield f"event: status\ndata: {json.dumps({'status': 'processing'}, ensure_ascii=False)}\n\n"
@@ -210,7 +224,7 @@ def extract_stream():
             yield f"event: error\ndata: {json.dumps({'error': str(e)}, ensure_ascii=False)}\n\n"
 
     return Response(
-        generate(),
+        generate(label, extraction_schema, pdf_base64),
         mimetype='text/event-stream',
         headers={
             'Cache-Control': 'no-cache',
