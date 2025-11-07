@@ -152,19 +152,13 @@ Durante o desenvolvimento, testamos múltiplas estratégias de otimização para
 ### Tech Stack Utilizado
 
 - **Model:** GPT-5-mini (gpt-5-mini-2025-08-07)
+- **AI CODING**: Claude code (esse sabe)
 - **Cache:** Dual-layer (.results_cache + cache/ + in-memory)
 - **Embeddings:** sentence-transformers (all-MiniLM-L6-v2)
 - **PDF Parsing:** PyMuPDF (fitz)
 - **Pattern Matching:** Regex conservador (apenas datas múltiplas)
 - **Validation:** Framework campo-a-campo (test_accuracy.py)
 
-### Próximos Passos
-
-Para atingir 100% de acurácia e <10s consistente:
-1. Investigar por que `total_de_parcelas` não é detectado (visível na imagem)
-2. Corrigir extração de `produto` (remover "0 extra)
-3. Explorar vision models para casos edge (GPT-4-vision para PDFs com layout complexo)
-4. Otimizar fingerprinting para template matching real (ignorar campos variáveis)
 
 ---
 
