@@ -178,6 +178,11 @@ class PDFExtractor:
         if not pdf_text:
             raise Exception("PDF vazio ou sem texto extraível")
 
+        # FASE 4A: Truncar texto para reduzir prompt tokens e reasoning time
+        if len(pdf_text) > 2000:
+            pdf_text = pdf_text[:2000]
+            print(f"         [TRUNCATE] Texto reduzido para 2000 chars")
+
         # 2. Pattern matching DESABILITADO (estava causando mais confusão que ajuda)
         # FASE 2 ROLLBACK: pattern matching agressivo piorou acurácia de 94.59% → 83.78%
         local_extracted = {}
@@ -189,32 +194,33 @@ class PDFExtractor:
         if all_dates and len(all_dates) > 1:
             print(f"         [DATAS] {len(all_dates)} data(s) encontrada(s): {all_dates}")
 
-        # 2.5 FASE 3: Buscar template similar (documento repetido)
-        template_match = self.cache.find_similar_template(pdf_text, label, extraction_schema)
-        if template_match and use_cache:
-            similarity = template_match['similarity']
-            print(f"         [TEMPLATE] Documento similar encontrado ({int(similarity*100)}% match)")
-            print(f"         [TEMPLATE] Reusando estrutura, LLM NÃO chamado")
-
-            # Reusar resultado do template (assumindo valores idênticos para docs idênticos)
-            # Em produção, poderia extrair apenas campos variáveis
-            template_result = template_match['template']
-
-            # Retornar resultado do template
-            return {
-                "success": True,
-                "data": template_result['data'],
-                "label": label,
-                "cost": 0.0,  # Cache = custo zero
-                "tokens": {
-                    "input": 0,
-                    "output": 0,
-                    "total": 0
-                },
-                "from_cache": True,
-                "from_template": True,
-                "template_similarity": similarity
-            }
+        # FASE 4A: Template matching DESABILITADO (não funciona, adiciona overhead)
+        # # 2.5 FASE 3: Buscar template similar (documento repetido)
+        # template_match = self.cache.find_similar_template(pdf_text, label, extraction_schema)
+        # if template_match and use_cache:
+        #     similarity = template_match['similarity']
+        #     print(f"         [TEMPLATE] Documento similar encontrado ({int(similarity*100)}% match)")
+        #     print(f"         [TEMPLATE] Reusando estrutura, LLM NÃO chamado")
+        #
+        #     # Reusar resultado do template (assumindo valores idênticos para docs idênticos)
+        #     # Em produção, poderia extrair apenas campos variáveis
+        #     template_result = template_match['template']
+        #
+        #     # Retornar resultado do template
+        #     return {
+        #         "success": True,
+        #         "data": template_result['data'],
+        #         "label": label,
+        #         "cost": 0.0,  # Cache = custo zero
+        #         "tokens": {
+        #             "input": 0,
+        #             "output": 0,
+        #             "total": 0
+        #         },
+        #         "from_cache": True,
+        #         "from_template": True,
+        #         "template_similarity": similarity
+        #     }
 
         # 3. Atualizar schema conhecido ANTES de buscar contexto
         self.cache.update_schema(label, extraction_schema)
@@ -256,10 +262,10 @@ class PDFExtractor:
                             "content": user_message
                         }
                     ],
-                    # OTIMIZADO: 1500 tokens (balanceado)
+                    # FASE 4A: 2500 tokens (mais confortável para reasoning)
                     # Reasoning tokens variável (~800-1200) + JSON compacto (~200-300)
-                    # Reduzido de 2000, mas com margem para reasoning do GPT-5
-                    max_completion_tokens=1500
+                    # Aumentado de 1500 para reduzir tempo de reasoning
+                    max_completion_tokens=2500
                 )
 
                 # 7. Calcular custo (pricing oficial gpt-5-mini)
@@ -313,9 +319,10 @@ class PDFExtractor:
                 }
 
                 # 12. Salvar resultado no cache para futuras consultas
-                # FASE 3: Salvar COM texto para template matching
+                # FASE 4A: Salvar SEM texto (template matching desabilitado)
                 if use_cache:
-                    self.cache.save_result_with_text(pdf_path, pdf_text, label, extraction_schema, result)
+                    # self.cache.save_result_with_text(pdf_path, pdf_text, label, extraction_schema, result)
+                    pass  # Cache de resultado já gerenciado por get_cached_result
 
                 return result
 
